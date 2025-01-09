@@ -5,9 +5,12 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\OrganizationResource;
 use App\Http\Resources\OrganizationCollection;
+use App\Http\Requests\Organization\GetOrganizationsByBuildingRequest;
+use App\Http\Requests\Organization\GetOrganizationsByCategoryRequest;
+use App\Http\Requests\Organization\GetOrganizationsByLocationRequest;
+use App\Http\Requests\Organization\SearchOrganizationsByCategoryRequest;
+use App\Http\Requests\Organization\SearchOrganizationsByNameRequest;
 use App\Services\OrganizationService;
-use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\JsonResource;
 
 class OrganizationController extends Controller
 {
@@ -20,86 +23,247 @@ class OrganizationController extends Controller
 
     /**
      * Get organizations in a specific building
+     * 
+     * @OA\Get(
+     *     path="/api/organizations/building/{buildingId}",
+     *     tags={"Organizations"},
+     *     summary="Get organizations by building ID",
+     *     @OA\Parameter(
+     *         name="buildingId",
+     *         in="path",
+     *         required=true,
+     *         description="Building ID",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Parameter(
+     *         name="per_page",
+     *         in="query",
+     *         required=false,
+     *         description="Items per page",
+     *         @OA\Schema(type="integer", minimum=1, maximum=100)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(ref="#/components/schemas/OrganizationCollection")
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Building not found"
+     *     )
+     * )
      */
-    public function getByBuilding($buildingId)
+    public function getByBuilding(GetOrganizationsByBuildingRequest $request, $buildingId)
     {
+        if ($request->has('per_page')) {
+            $this->organizationService->setPerPage($request->per_page);
+        }
+
         $organizations = $this->organizationService->getOrganizationsByBuilding($buildingId);
         return new OrganizationCollection($organizations);
     }
 
     /**
      * Get organizations by category
+     * 
+     * @OA\Get(
+     *     path="/api/organizations/category/{categoryId}",
+     *     tags={"Organizations"},
+     *     summary="Get organizations by category ID",
+     *     @OA\Parameter(
+     *         name="categoryId",
+     *         in="path",
+     *         required=true,
+     *         description="Category ID",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Parameter(
+     *         name="per_page",
+     *         in="query",
+     *         required=false,
+     *         description="Items per page",
+     *         @OA\Schema(type="integer", minimum=1, maximum=100)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(ref="#/components/schemas/OrganizationCollection")
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Category not found"
+     *     )
+     * )
      */
-    public function getByCategory($categoryId)
+    public function getByCategory(GetOrganizationsByCategoryRequest $request, $categoryId)
     {
+        if ($request->has('per_page')) {
+            $this->organizationService->setPerPage($request->per_page);
+        }
+
         $organizations = $this->organizationService->getOrganizationsByCategory($categoryId);
         return new OrganizationCollection($organizations);
     }
 
     /**
      * Get organizations within geographical area
+     * 
+     * @OA\Post(
+     *     path="/api/organizations/location",
+     *     tags={"Organizations"},
+     *     summary="Get organizations within a geographical area",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"latitude", "longitude"},
+     *             @OA\Property(property="latitude", type="number", format="float", example=55.7558),
+     *             @OA\Property(property="longitude", type="number", format="float", example=37.6173),
+     *             @OA\Property(property="radius", type="number", format="float", example=1000),
+     *             @OA\Property(
+     *                 property="bounds",
+     *                 type="object",
+     *                 @OA\Property(property="sw_lat", type="number", format="float", example=55.7),
+     *                 @OA\Property(property="sw_lng", type="number", format="float", example=37.6),
+     *                 @OA\Property(property="ne_lat", type="number", format="float", example=55.8),
+     *                 @OA\Property(property="ne_lng", type="number", format="float", example=37.7)
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(ref="#/components/schemas/OrganizationCollection")
+     *     )
+     * )
      */
-    public function getByLocation(Request $request)
+    public function getByLocation(GetOrganizationsByLocationRequest $request)
     {
-        $request->validate([
-            'latitude' => 'required|numeric',
-            'longitude' => 'required|numeric',
-            'radius' => 'required_without:bounds|numeric',
-            'bounds' => 'required_without:radius|array',
-            'bounds.sw_lat' => 'required_with:bounds|numeric',
-            'bounds.sw_lng' => 'required_with:bounds|numeric',
-            'bounds.ne_lat' => 'required_with:bounds|numeric',
-            'bounds.ne_lng' => 'required_with:bounds|numeric',
-            'per_page' => 'sometimes|integer|min:1|max:100'
-        ]);
-
         if ($request->has('per_page')) {
             $this->organizationService->setPerPage($request->per_page);
         }
 
-        $organizations = $this->organizationService->getOrganizationsInArea(
-            $request->latitude,
-            $request->longitude,
-            $request->radius ?? null,
-            $request->bounds ?? null
-        );
+        if ($request->has('radius')) {
+            $organizations = $this->organizationService->findInArea(
+                $request->latitude,
+                $request->longitude,
+                $request->radius
+            );
+        } else {
+            $organizations = $this->organizationService->findInArea(
+                $request->latitude,
+                $request->longitude,
+                null,
+                $request->bounds
+            );
+        }
 
         return new OrganizationCollection($organizations);
     }
 
     /**
-     * Get organization by ID
+     * Search organizations by category name
+     * 
+     * @OA\Get(
+     *     path="/api/organizations/search/category/{name}",
+     *     tags={"Organizations"},
+     *     summary="Search organizations by category name",
+     *     @OA\Parameter(
+     *         name="name",
+     *         in="path",
+     *         required=true,
+     *         description="Category name to search for",
+     *         @OA\Schema(type="string")
+     *     ),
+     *     @OA\Parameter(
+     *         name="per_page",
+     *         in="query",
+     *         required=false,
+     *         description="Items per page",
+     *         @OA\Schema(type="integer", minimum=1, maximum=100)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(ref="#/components/schemas/OrganizationCollection")
+     *     )
+     * )
      */
-    public function show($id)
+    public function searchByCategory(SearchOrganizationsByCategoryRequest $request, $name)
     {
-        $organization = $this->organizationService->getOrganizationById($id);
-        return new OrganizationResource($organization);
-    }
+        if ($request->has('per_page')) {
+            $this->organizationService->setPerPage($request->per_page);
+        }
 
-    /**
-     * Search organizations by category tree
-     */
-    public function searchByCategory($name)
-    {
-        $organizations = $this->organizationService->searchOrganizationsByCategory($name);
+        $organizations = $this->organizationService->searchByCategory($name);
         return new OrganizationCollection($organizations);
     }
 
     /**
      * Search organizations by name
+     * 
+     * @OA\Get(
+     *     path="/api/organizations/search",
+     *     tags={"Organizations"},
+     *     summary="Search organizations by name",
+     *     @OA\Parameter(
+     *         name="name",
+     *         in="query",
+     *         required=true,
+     *         description="Organization name to search for",
+     *         @OA\Schema(type="string")
+     *     ),
+     *     @OA\Parameter(
+     *         name="per_page",
+     *         in="query",
+     *         required=false,
+     *         description="Items per page",
+     *         @OA\Schema(type="integer", minimum=1, maximum=100)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(ref="#/components/schemas/OrganizationCollection")
+     *     )
+     * )
      */
-    public function searchByName(Request $request)
+    public function searchByName(SearchOrganizationsByNameRequest $request)
     {
-        $request->validate([
-            'name' => 'required|string|min:2',
-            'per_page' => 'sometimes|integer|min:1|max:100'
-        ]);
-
         if ($request->has('per_page')) {
             $this->organizationService->setPerPage($request->per_page);
         }
 
-        $organizations = $this->organizationService->searchOrganizationsByName($request->name);
+        $organizations = $this->organizationService->searchByName($request->name);
         return new OrganizationCollection($organizations);
+    }
+
+    /**
+     * Get organization by ID
+     * 
+     * @OA\Get(
+     *     path="/api/organizations/{id}",
+     *     tags={"Organizations"},
+     *     summary="Get organization by ID",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="Organization ID",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(ref="#/components/schemas/OrganizationResource")
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Organization not found"
+     *     )
+     * )
+     */
+    public function show($id)
+    {
+        $organization = $this->organizationService->findById($id);
+        return new OrganizationResource($organization);
     }
 }

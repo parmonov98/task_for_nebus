@@ -2,12 +2,23 @@
 
 namespace App\Http\Resources;
 
-use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @OA\Schema(
+ *     schema="PhoneResource",
+ *     title="Phone Resource",
+ *     description="Phone resource",
+ *     @OA\Property(property="id", type="integer", example=1),
+ *     @OA\Property(property="number", type="string", example="+1234567890"),
+ *     @OA\Property(property="organization_id", type="integer", example=1),
+ *     @OA\Property(property="created_at", type="string", format="date-time"),
+ *     @OA\Property(property="updated_at", type="string", format="date-time")
+ * )
+ */
 class PhoneResource extends JsonResource
 {
-    public function toArray(Request $request): array
+    public function toArray($request): array
     {
         return [
             'id' => $this->id,

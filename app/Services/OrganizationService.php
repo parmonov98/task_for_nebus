@@ -23,22 +23,22 @@ class OrganizationService
         return $this->repository->findByCategory($categoryId);
     }
 
-    public function getOrganizationsInArea(float $lat, float $lng, ?float $radius = null, ?array $bounds = null)
+    public function findInArea(float $lat, float $lng, ?float $radius = null, ?array $bounds = null)
     {
         return $this->repository->findInArea($lat, $lng, $radius, $bounds);
     }
 
-    public function searchOrganizationsByName(string $name)
+    public function searchByName(string $name)
     {
         return $this->repository->searchByName($name);
     }
 
-    public function getOrganizationById(int $id)
+    public function findById(int $id)
     {
         return $this->repository->findById($id);
     }
 
-    public function searchOrganizationsByCategory(string $categoryName)
+    public function searchByCategory(string $categoryName)
     {
         return $this->repository->searchByCategory($categoryName);
     }

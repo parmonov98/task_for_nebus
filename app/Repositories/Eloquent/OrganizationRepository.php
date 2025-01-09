@@ -21,12 +21,20 @@ class OrganizationRepository implements OrganizationRepositoryInterface
 
     public function findByCategory(int $categoryId): LengthAwarePaginator
     {
-        $categoryIds = Category::where('id', $categoryId)
-            ->orWhere('parent_id', $categoryId)
+        // Get the category and all its descendants
+        $category = Category::findOrFail($categoryId);
+        $descendantIds = Category::where('id', $category->id)
+            ->orWhere(function ($query) use ($category) {
+                $query->where('parent_id', $category->id)
+                    ->orWhereIn(
+                        'parent_id',
+                        Category::where('parent_id', $category->id)->pluck('id')
+                    );
+            })
             ->pluck('id');
 
-        return Organization::whereHas('categories', function ($query) use ($categoryIds) {
-            $query->whereIn('categories.id', $categoryIds);
+        return Organization::whereHas('categories', function ($query) use ($descendantIds) {
+            $query->whereIn('categories.id', $descendantIds);
         })
             ->with(['categories', 'phones', 'building'])
             ->paginate($this->perPage);
@@ -68,15 +76,15 @@ class OrganizationRepository implements OrganizationRepositoryInterface
 
     public function searchByCategory(string $categoryName): LengthAwarePaginator
     {
-        $category = Category::where('name', 'like', "%{$categoryName}%")
-            ->where('level', '<=', 3)
-            ->first();
+        // Find the category by name
+        $category = Category::where('name', 'like', "%{$categoryName}%")->first();
 
         if (!$category) {
             return Organization::where('id', '<', 0)->paginate($this->perPage); // Empty paginator
         }
 
-        $categoryIds = Category::where('id', $category->id)
+        // Get the category and all its descendants
+        $descendantIds = Category::where('id', $category->id)
             ->orWhere(function ($query) use ($category) {
                 $query->where('parent_id', $category->id)
                     ->orWhereIn(
@@ -86,8 +94,9 @@ class OrganizationRepository implements OrganizationRepositoryInterface
             })
             ->pluck('id');
 
-        return Organization::whereHas('categories', function ($query) use ($categoryIds) {
-            $query->whereIn('categories.id', $categoryIds);
+        // Find organizations that belong to the category or any of its descendants
+        return Organization::whereHas('categories', function ($query) use ($descendantIds) {
+            $query->whereIn('categories.id', $descendantIds);
         })
             ->with(['categories', 'phones', 'building'])
             ->paginate($this->perPage);

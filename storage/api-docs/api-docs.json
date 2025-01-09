@@ -1,0 +1,898 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Organization Directory API",
+        "description": "API for managing organizations and their locations",
+        "contact": {
+            "email": "admin@example.com"
+        },
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://my-default-host.com",
+            "description": "API Server"
+        }
+    ],
+    "paths": {
+        "/api/buildings": {
+            "get": {
+                "tags": [
+                    "Buildings"
+                ],
+                "summary": "Get all buildings",
+                "description": "Get all buildings with pagination",
+                "operationId": "572e55bad0698264e29e3722676f8d00",
+                "parameters": [
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Items per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 100,
+                            "minimum": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/BuildingCollection"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/buildings/{id}": {
+            "get": {
+                "tags": [
+                    "Buildings"
+                ],
+                "summary": "Get building by ID",
+                "description": "Get building by ID with its organizations",
+                "operationId": "d9f77e33d7b4cdc3c8f2bf22f5e66e51",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Building ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/BuildingResource"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Building not found"
+                    }
+                }
+            }
+        },
+        "/api/buildings/location": {
+            "post": {
+                "tags": [
+                    "Buildings"
+                ],
+                "summary": "Get buildings within a geographical area",
+                "description": "Get buildings within geographical area",
+                "operationId": "65dd7a7b7080da235283c5fa369b1b50",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "latitude",
+                                    "longitude"
+                                ],
+                                "properties": {
+                                    "latitude": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 55.7558
+                                    },
+                                    "longitude": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 37.6173
+                                    },
+                                    "radius": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 1000
+                                    },
+                                    "bounds": {
+                                        "properties": {
+                                            "sw_lat": {
+                                                "type": "number",
+                                                "format": "float",
+                                                "example": 55.7
+                                            },
+                                            "sw_lng": {
+                                                "type": "number",
+                                                "format": "float",
+                                                "example": 37.6
+                                            },
+                                            "ne_lat": {
+                                                "type": "number",
+                                                "format": "float",
+                                                "example": 55.8
+                                            },
+                                            "ne_lng": {
+                                                "type": "number",
+                                                "format": "float",
+                                                "example": 37.7
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/BuildingCollection"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/organizations/building/{buildingId}": {
+            "get": {
+                "tags": [
+                    "Organizations"
+                ],
+                "summary": "Get organizations by building ID",
+                "description": "Get organizations in a specific building",
+                "operationId": "4a27e095a6c8752e92df909c27d7df6e",
+                "parameters": [
+                    {
+                        "name": "buildingId",
+                        "in": "path",
+                        "description": "Building ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Items per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 100,
+                            "minimum": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OrganizationCollection"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Building not found"
+                    }
+                }
+            }
+        },
+        "/api/organizations/category/{categoryId}": {
+            "get": {
+                "tags": [
+                    "Organizations"
+                ],
+                "summary": "Get organizations by category ID",
+                "description": "Get organizations by category",
+                "operationId": "d6ae798d2414f8943dd2589229a59ce6",
+                "parameters": [
+                    {
+                        "name": "categoryId",
+                        "in": "path",
+                        "description": "Category ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Items per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 100,
+                            "minimum": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OrganizationCollection"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Category not found"
+                    }
+                }
+            }
+        },
+        "/api/organizations/location": {
+            "post": {
+                "tags": [
+                    "Organizations"
+                ],
+                "summary": "Get organizations within a geographical area",
+                "description": "Get organizations within geographical area",
+                "operationId": "93a1ae2262e002a94d17b22f57d519d1",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "latitude",
+                                    "longitude"
+                                ],
+                                "properties": {
+                                    "latitude": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 55.7558
+                                    },
+                                    "longitude": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 37.6173
+                                    },
+                                    "radius": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 1000
+                                    },
+                                    "bounds": {
+                                        "properties": {
+                                            "sw_lat": {
+                                                "type": "number",
+                                                "format": "float",
+                                                "example": 55.7
+                                            },
+                                            "sw_lng": {
+                                                "type": "number",
+                                                "format": "float",
+                                                "example": 37.6
+                                            },
+                                            "ne_lat": {
+                                                "type": "number",
+                                                "format": "float",
+                                                "example": 55.8
+                                            },
+                                            "ne_lng": {
+                                                "type": "number",
+                                                "format": "float",
+                                                "example": 37.7
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OrganizationCollection"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/organizations/search/category/{name}": {
+            "get": {
+                "tags": [
+                    "Organizations"
+                ],
+                "summary": "Search organizations by category name",
+                "description": "Search organizations by category name",
+                "operationId": "fc4f2ca0655df7391b893f7dfe0c7446",
+                "parameters": [
+                    {
+                        "name": "name",
+                        "in": "path",
+                        "description": "Category name to search for",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Items per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 100,
+                            "minimum": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OrganizationCollection"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/organizations/search": {
+            "get": {
+                "tags": [
+                    "Organizations"
+                ],
+                "summary": "Search organizations by name",
+                "description": "Search organizations by name",
+                "operationId": "4f8950e62fc599998175fa446d5c4a94",
+                "parameters": [
+                    {
+                        "name": "name",
+                        "in": "query",
+                        "description": "Organization name to search for",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Items per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 100,
+                            "minimum": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OrganizationCollection"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/organizations/{id}": {
+            "get": {
+                "tags": [
+                    "Organizations"
+                ],
+                "summary": "Get organization by ID",
+                "description": "Get organization by ID",
+                "operationId": "11826ee077ae441c61f2bee8476e2a14",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Organization ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OrganizationResource"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Organization not found"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "GetOrganizationsByBuildingRequest": {
+                "title": "Get Organizations By Building Request",
+                "required": [
+                    "buildingId"
+                ],
+                "properties": {
+                    "buildingId": {
+                        "description": "Building ID",
+                        "type": "integer"
+                    },
+                    "per_page": {
+                        "description": "Items per page",
+                        "type": "integer",
+                        "maximum": 100,
+                        "minimum": 1
+                    }
+                },
+                "type": "object"
+            },
+            "GetOrganizationsByCategoryRequest": {
+                "title": "Get Organizations By Category Request",
+                "required": [
+                    "categoryId"
+                ],
+                "properties": {
+                    "categoryId": {
+                        "description": "Category ID",
+                        "type": "integer"
+                    },
+                    "per_page": {
+                        "description": "Items per page",
+                        "type": "integer",
+                        "maximum": 100,
+                        "minimum": 1
+                    }
+                },
+                "type": "object"
+            },
+            "GetOrganizationsByLocationRequest": {
+                "title": "Get Organizations By Location Request",
+                "required": [
+                    "latitude",
+                    "longitude"
+                ],
+                "properties": {
+                    "latitude": {
+                        "description": "Latitude",
+                        "type": "number",
+                        "format": "float",
+                        "maximum": 90,
+                        "minimum": -90
+                    },
+                    "longitude": {
+                        "description": "Longitude",
+                        "type": "number",
+                        "format": "float",
+                        "maximum": 180,
+                        "minimum": -180
+                    },
+                    "radius": {
+                        "description": "Search radius in meters",
+                        "type": "number",
+                        "format": "float"
+                    },
+                    "bounds": {
+                        "description": "Rectangular bounds for search",
+                        "properties": {
+                            "sw_lat": {
+                                "type": "number",
+                                "format": "float",
+                                "maximum": 90,
+                                "minimum": -90
+                            },
+                            "sw_lng": {
+                                "type": "number",
+                                "format": "float",
+                                "maximum": 180,
+                                "minimum": -180
+                            },
+                            "ne_lat": {
+                                "type": "number",
+                                "format": "float",
+                                "maximum": 90,
+                                "minimum": -90
+                            },
+                            "ne_lng": {
+                                "type": "number",
+                                "format": "float",
+                                "maximum": 180,
+                                "minimum": -180
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "per_page": {
+                        "description": "Items per page",
+                        "type": "integer",
+                        "maximum": 100,
+                        "minimum": 1
+                    }
+                },
+                "type": "object"
+            },
+            "SearchOrganizationsByCategoryRequest": {
+                "title": "Search Organizations By Category Request",
+                "required": [
+                    "name"
+                ],
+                "properties": {
+                    "name": {
+                        "description": "Category name to search for",
+                        "type": "string",
+                        "maxLength": 255,
+                        "minLength": 1
+                    },
+                    "per_page": {
+                        "description": "Items per page",
+                        "type": "integer",
+                        "maximum": 100,
+                        "minimum": 1
+                    }
+                },
+                "type": "object"
+            },
+            "SearchOrganizationsByNameRequest": {
+                "title": "Search Organizations By Name Request",
+                "required": [
+                    "name"
+                ],
+                "properties": {
+                    "name": {
+                        "description": "Organization name to search for",
+                        "type": "string",
+                        "maxLength": 255,
+                        "minLength": 1
+                    },
+                    "per_page": {
+                        "description": "Items per page",
+                        "type": "integer",
+                        "maximum": 100,
+                        "minimum": 1
+                    }
+                },
+                "type": "object"
+            },
+            "BuildingCollection": {
+                "title": "Building Collection",
+                "description": "Collection of buildings",
+                "properties": {
+                    "data": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/BuildingResource"
+                        }
+                    },
+                    "links": {
+                        "properties": {
+                            "first": {
+                                "type": "string",
+                                "format": "uri"
+                            },
+                            "last": {
+                                "type": "string",
+                                "format": "uri"
+                            },
+                            "prev": {
+                                "type": "string",
+                                "format": "uri",
+                                "nullable": true
+                            },
+                            "next": {
+                                "type": "string",
+                                "format": "uri",
+                                "nullable": true
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "meta": {
+                        "properties": {
+                            "current_page": {
+                                "type": "integer"
+                            },
+                            "from": {
+                                "type": "integer"
+                            },
+                            "last_page": {
+                                "type": "integer"
+                            },
+                            "path": {
+                                "type": "string"
+                            },
+                            "per_page": {
+                                "type": "integer"
+                            },
+                            "to": {
+                                "type": "integer"
+                            },
+                            "total": {
+                                "type": "integer"
+                            }
+                        },
+                        "type": "object"
+                    }
+                },
+                "type": "object"
+            },
+            "BuildingResource": {
+                "title": "Building Resource",
+                "description": "Building resource",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Building Name"
+                    },
+                    "address": {
+                        "type": "string",
+                        "example": "123 Main St"
+                    },
+                    "latitude": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 55.7558
+                    },
+                    "longitude": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 37.6173
+                    },
+                    "organizations": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/OrganizationResource"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "CategoryResource": {
+                "title": "Category Resource",
+                "description": "Category resource",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Category Name"
+                    },
+                    "level": {
+                        "type": "integer",
+                        "example": 0
+                    },
+                    "parent_id": {
+                        "type": "integer",
+                        "example": null,
+                        "nullable": true
+                    },
+                    "children": {
+                        "description": "Nested child categories",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/CategoryResource"
+                        }
+                    },
+                    "parent": {
+                        "$ref": "#/components/schemas/CategoryResource"
+                    },
+                    "organizations": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/OrganizationResource"
+                        }
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "OrganizationCollection": {
+                "title": "Organization Collection",
+                "description": "Collection of organizations",
+                "properties": {
+                    "data": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/OrganizationResource"
+                        }
+                    },
+                    "links": {
+                        "properties": {
+                            "first": {
+                                "type": "string",
+                                "format": "uri"
+                            },
+                            "last": {
+                                "type": "string",
+                                "format": "uri"
+                            },
+                            "prev": {
+                                "type": "string",
+                                "format": "uri",
+                                "nullable": true
+                            },
+                            "next": {
+                                "type": "string",
+                                "format": "uri",
+                                "nullable": true
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "meta": {
+                        "properties": {
+                            "current_page": {
+                                "type": "integer"
+                            },
+                            "from": {
+                                "type": "integer"
+                            },
+                            "last_page": {
+                                "type": "integer"
+                            },
+                            "path": {
+                                "type": "string"
+                            },
+                            "per_page": {
+                                "type": "integer"
+                            },
+                            "to": {
+                                "type": "integer"
+                            },
+                            "total": {
+                                "type": "integer"
+                            }
+                        },
+                        "type": "object"
+                    }
+                },
+                "type": "object"
+            },
+            "OrganizationResource": {
+                "title": "Organization Resource",
+                "description": "Organization resource",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Organization Name"
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "Organization Description"
+                    },
+                    "categories": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/CategoryResource"
+                        }
+                    },
+                    "phones": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PhoneResource"
+                        }
+                    },
+                    "building": {
+                        "$ref": "#/components/schemas/BuildingResource"
+                    }
+                },
+                "type": "object"
+            },
+            "PhoneResource": {
+                "title": "Phone Resource",
+                "description": "Phone resource",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "number": {
+                        "type": "string",
+                        "example": "+1234567890"
+                    },
+                    "organization_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            }
+        },
+        "securitySchemes": {
+            "ApiKeyAuth": {
+                "type": "apiKey",
+                "name": "X-API-Key",
+                "in": "header"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Buildings",
+            "description": "API Endpoints for buildings"
+        },
+        {
+            "name": "Organizations",
+            "description": "Organizations"
+        }
+    ]
+}
