@@ -3,22 +3,19 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\GetOrganizationsByBuildingRequest;
 use App\Http\Resources\OrganizationResource;
 use App\Http\Resources\OrganizationCollection;
-use App\Http\Requests\Organization\GetOrganizationsByBuildingRequest;
-use App\Http\Requests\Organization\GetOrganizationsByCategoryRequest;
-use App\Http\Requests\Organization\GetOrganizationsByLocationRequest;
-use App\Http\Requests\Organization\SearchOrganizationsByCategoryRequest;
-use App\Http\Requests\Organization\SearchOrganizationsByNameRequest;
+use App\Http\Requests\GetOrganizationsByCategoryRequest;
+use App\Http\Requests\GetOrganizationsByLocationRequest;
+use App\Http\Requests\SearchOrganizationsByCategoryRequest;
+use App\Http\Requests\SearchOrganizationsByNameRequest;
 use App\Services\OrganizationService;
 
 class OrganizationController extends Controller
 {
-    private $organizationService;
-
-    public function __construct(OrganizationService $organizationService)
+    public function __construct(protected OrganizationService $organizationService)
     {
-        $this->organizationService = $organizationService;
     }
 
     /**

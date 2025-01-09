@@ -10,7 +10,7 @@
     },
     "servers": [
         {
-            "url": "http://my-default-host.com",
+            "url": "http://localhost:8000",
             "description": "API Server"
         }
     ],
@@ -880,6 +880,7 @@
         "securitySchemes": {
             "ApiKeyAuth": {
                 "type": "apiKey",
+                "description": "Enter API key in format: your-api-key",
                 "name": "X-API-Key",
                 "in": "header"
             }
@@ -893,6 +894,11 @@
         {
             "name": "Organizations",
             "description": "Organizations"
+        }
+    ],
+    "security": [
+        {
+            "ApiKeyAuth": []
         }
     ]
 }
