@@ -12,11 +12,7 @@ class BuildingRepository implements BuildingRepositoryInterface
 
     public function getAllPaginated(): LengthAwarePaginator
     {
-        return Building::with([
-            'organizations' => function ($query) {
-                $query->with(['categories', 'phones']);
-            }
-        ])->paginate($this->perPage);
+        return Building::query()->paginate($this->perPage);
     }
 
     public function findById(int $id): ?Building

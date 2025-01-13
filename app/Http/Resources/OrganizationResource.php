@@ -34,9 +34,9 @@ class OrganizationResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'description' => $this->description,
-            'categories' => CategoryResource::collection($this->whenLoaded('categories')),
-            'phones' => PhoneResource::collection($this->whenLoaded('phones')),
-            'building' => new BuildingResource($this->whenLoaded('building'))
+            'categories' => CategoryResource::collection($this->whenLoaded('categories')) ?? [],
+            'phones' => PhoneResource::collection($this->whenLoaded('phones')) ?? [],
+            'building' => new BuildingResource($this->whenLoaded('building')) ?? []
         ];
     }
 }

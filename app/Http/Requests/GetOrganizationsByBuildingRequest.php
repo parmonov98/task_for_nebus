@@ -8,11 +8,6 @@ namespace App\Http\Requests;
  *     title="Get Organizations By Building Request",
  *     required={"buildingId"},
  *     @OA\Property(
- *         property="buildingId",
- *         type="integer",
- *         description="Building ID"
- *     ),
- *     @OA\Property(
  *         property="per_page",
  *         type="integer",
  *         description="Items per page",
@@ -27,7 +22,6 @@ class GetOrganizationsByBuildingRequest extends BaseRequest
     {
         return [
             'per_page' => 'sometimes|integer|min:1|max:100',
-            'buildingId' => 'required|integer|exists:buildings,id'
         ];
     }
 }

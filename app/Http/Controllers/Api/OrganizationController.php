@@ -68,13 +68,6 @@ class OrganizationController extends Controller
      *     tags={"Organizations"},
      *     summary="Get organizations by category ID",
      *     @OA\Parameter(
-     *         name="categoryId",
-     *         in="path",
-     *         required=true,
-     *         description="Category ID",
-     *         @OA\Schema(type="integer")
-     *     ),
-     *     @OA\Parameter(
      *         name="per_page",
      *         in="query",
      *         required=false,
@@ -143,14 +136,13 @@ class OrganizationController extends Controller
             $organizations = $this->organizationService->findInArea(
                 $request->latitude,
                 $request->longitude,
-                $request->radius
+                radius: $request->radius,
             );
         } else {
             $organizations = $this->organizationService->findInArea(
                 $request->latitude,
                 $request->longitude,
-                null,
-                $request->bounds
+                bounds: $request->bounds
             );
         }
 

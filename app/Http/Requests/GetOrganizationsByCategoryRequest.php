@@ -27,7 +27,6 @@ class GetOrganizationsByCategoryRequest extends BaseRequest
     {
         return [
             'per_page' => 'sometimes|integer|min:1|max:100',
-            'categoryId' => 'required|integer|exists:categories,id'
         ];
     }
 }
