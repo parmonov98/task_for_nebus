@@ -4,13 +4,16 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\GetOrganizationsByBuildingRequest;
-use App\Http\Resources\OrganizationResource;
-use App\Http\Resources\OrganizationCollection;
 use App\Http\Requests\GetOrganizationsByCategoryRequest;
 use App\Http\Requests\GetOrganizationsByLocationRequest;
+use App\Http\Requests\GetOrganizationsByRadiusRequest;
+use App\Http\Requests\GetOrganizationsByBoundsRequest;
 use App\Http\Requests\SearchOrganizationsByCategoryRequest;
 use App\Http\Requests\SearchOrganizationsByNameRequest;
+use App\Http\Resources\OrganizationResource;
+use App\Http\Resources\OrganizationCollection;
 use App\Services\OrganizationService;
+use Illuminate\Http\Request;
 
 class OrganizationController extends Controller
 {
@@ -96,28 +99,15 @@ class OrganizationController extends Controller
     }
 
     /**
-     * Get organizations within geographical area
+     * Get organizations within radius
      * 
      * @OA\Post(
-     *     path="/api/organizations/location",
+     *     path="/api/organizations/radius",
      *     tags={"Organizations"},
-     *     summary="Get organizations within a geographical area",
+     *     summary="Get organizations within a radius",
      *     @OA\RequestBody(
      *         required=true,
-     *         @OA\JsonContent(
-     *             required={"latitude", "longitude"},
-     *             @OA\Property(property="latitude", type="number", format="float", example=55.7558),
-     *             @OA\Property(property="longitude", type="number", format="float", example=37.6173),
-     *             @OA\Property(property="radius", type="number", format="float", example=1000),
-     *             @OA\Property(
-     *                 property="bounds",
-     *                 type="object",
-     *                 @OA\Property(property="sw_lat", type="number", format="float", example=55.7),
-     *                 @OA\Property(property="sw_lng", type="number", format="float", example=37.6),
-     *                 @OA\Property(property="ne_lat", type="number", format="float", example=55.8),
-     *                 @OA\Property(property="ne_lng", type="number", format="float", example=37.7)
-     *             )
-     *         )
+     *         @OA\JsonContent(ref="#/components/schemas/GetOrganizationsByRadiusRequest")
      *     ),
      *     @OA\Response(
      *         response=200,
@@ -126,25 +116,50 @@ class OrganizationController extends Controller
      *     )
      * )
      */
-    public function getByLocation(GetOrganizationsByLocationRequest $request)
+    public function getByRadius(GetOrganizationsByRadiusRequest $request)
     {
         if ($request->has('per_page')) {
             $this->organizationService->setPerPage($request->per_page);
         }
 
-        if ($request->has('radius')) {
-            $organizations = $this->organizationService->findInArea(
-                $request->latitude,
-                $request->longitude,
-                radius: $request->radius,
-            );
-        } else {
-            $organizations = $this->organizationService->findInArea(
-                $request->latitude,
-                $request->longitude,
-                bounds: $request->bounds
-            );
+        $organizations = $this->organizationService->findInArea(
+            $request->latitude,
+            $request->longitude,
+            radius: $request->radius
+        );
+
+        return new OrganizationCollection($organizations);
+    }
+
+    /**
+     * Get organizations within bounds
+     * 
+     * @OA\Post(
+     *     path="/api/organizations/bounds",
+     *     tags={"Organizations"},
+     *     summary="Get organizations within geographical bounds",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(ref="#/components/schemas/GetOrganizationsByBoundsRequest")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful operation",
+     *         @OA\JsonContent(ref="#/components/schemas/OrganizationCollection")
+     *     )
+     * )
+     */
+    public function getByBounds(GetOrganizationsByBoundsRequest $request)
+    {
+        if ($request->has('per_page')) {
+            $this->organizationService->setPerPage($request->per_page);
         }
+
+        $organizations = $this->organizationService->findInArea(
+            0,
+            0,
+            bounds: $request->bounds
+        );
 
         return new OrganizationCollection($organizations);
     }

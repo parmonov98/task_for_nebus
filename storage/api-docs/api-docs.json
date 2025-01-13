@@ -86,84 +86,6 @@
                 }
             }
         },
-        "/api/buildings/location": {
-            "post": {
-                "tags": [
-                    "Buildings"
-                ],
-                "summary": "Get buildings within a geographical area",
-                "description": "Get buildings within geographical area",
-                "operationId": "65dd7a7b7080da235283c5fa369b1b50",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "latitude",
-                                    "longitude"
-                                ],
-                                "properties": {
-                                    "latitude": {
-                                        "type": "number",
-                                        "format": "float",
-                                        "example": 55.7558
-                                    },
-                                    "longitude": {
-                                        "type": "number",
-                                        "format": "float",
-                                        "example": 37.6173
-                                    },
-                                    "radius": {
-                                        "type": "number",
-                                        "format": "float",
-                                        "example": 1000
-                                    },
-                                    "bounds": {
-                                        "properties": {
-                                            "sw_lat": {
-                                                "type": "number",
-                                                "format": "float",
-                                                "example": 55.7
-                                            },
-                                            "sw_lng": {
-                                                "type": "number",
-                                                "format": "float",
-                                                "example": 37.6
-                                            },
-                                            "ne_lat": {
-                                                "type": "number",
-                                                "format": "float",
-                                                "example": 55.8
-                                            },
-                                            "ne_lng": {
-                                                "type": "number",
-                                                "format": "float",
-                                                "example": 37.7
-                                            }
-                                        },
-                                        "type": "object"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Successful operation",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/BuildingCollection"
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
         "/api/organizations/building/{buildingId}": {
             "get": {
                 "tags": [
@@ -221,15 +143,6 @@
                 "operationId": "d6ae798d2414f8943dd2589229a59ce6",
                 "parameters": [
                     {
-                        "name": "categoryId",
-                        "in": "path",
-                        "description": "Category ID",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    },
-                    {
                         "name": "per_page",
                         "in": "query",
                         "description": "Items per page",
@@ -258,14 +171,14 @@
                 }
             }
         },
-        "/api/organizations/location": {
+        "/api/organizations/radius": {
             "post": {
                 "tags": [
                     "Organizations"
                 ],
-                "summary": "Get organizations within a geographical area",
-                "description": "Get organizations within geographical area",
-                "operationId": "93a1ae2262e002a94d17b22f57d519d1",
+                "summary": "Get organizations within a radius",
+                "description": "Get organizations within radius",
+                "operationId": "63da6228b409469dd2d4efd3c2f63778",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -273,7 +186,8 @@
                             "schema": {
                                 "required": [
                                     "latitude",
-                                    "longitude"
+                                    "longitude",
+                                    "radius"
                                 ],
                                 "properties": {
                                     "latitude": {
@@ -290,8 +204,51 @@
                                         "type": "number",
                                         "format": "float",
                                         "example": 1000
-                                    },
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/OrganizationCollection"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/organizations/bounds": {
+            "post": {
+                "tags": [
+                    "Organizations"
+                ],
+                "summary": "Get organizations within geographical bounds",
+                "description": "Get organizations within bounds",
+                "operationId": "37cf90f7ecdb7b91cd802c6b0b38c5d7",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "bounds"
+                                ],
+                                "properties": {
                                     "bounds": {
+                                        "required": [
+                                            "sw_lat",
+                                            "sw_lng",
+                                            "ne_lat",
+                                            "ne_lng"
+                                        ],
                                         "properties": {
                                             "sw_lat": {
                                                 "type": "number",
@@ -469,10 +426,6 @@
                     "buildingId"
                 ],
                 "properties": {
-                    "buildingId": {
-                        "description": "Building ID",
-                        "type": "integer"
-                    },
                     "per_page": {
                         "description": "Items per page",
                         "type": "integer",

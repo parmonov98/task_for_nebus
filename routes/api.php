@@ -13,6 +13,8 @@ Route::middleware('api.key')->group(function () {
         Route::get('search/category/{name}', [OrganizationController::class, 'searchByCategory']);
         Route::get('search', [OrganizationController::class, 'searchByName']);
         Route::get('{id}', [OrganizationController::class, 'show']);
+        Route::post('radius', [OrganizationController::class, 'getByRadius']);
+        Route::post('bounds', [OrganizationController::class, 'getByBounds']);
     });
 
     // Building Routes
