@@ -184,29 +184,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "required": [
-                                    "latitude",
-                                    "longitude",
-                                    "radius"
-                                ],
-                                "properties": {
-                                    "latitude": {
-                                        "type": "number",
-                                        "format": "float",
-                                        "example": 55.7558
-                                    },
-                                    "longitude": {
-                                        "type": "number",
-                                        "format": "float",
-                                        "example": 37.6173
-                                    },
-                                    "radius": {
-                                        "type": "number",
-                                        "format": "float",
-                                        "example": 1000
-                                    }
-                                },
-                                "type": "object"
+                                "$ref": "#/components/schemas/GetOrganizationsByRadiusRequest"
                             }
                         }
                     }
@@ -238,43 +216,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "required": [
-                                    "bounds"
-                                ],
-                                "properties": {
-                                    "bounds": {
-                                        "required": [
-                                            "sw_lat",
-                                            "sw_lng",
-                                            "ne_lat",
-                                            "ne_lng"
-                                        ],
-                                        "properties": {
-                                            "sw_lat": {
-                                                "type": "number",
-                                                "format": "float",
-                                                "example": 55.7
-                                            },
-                                            "sw_lng": {
-                                                "type": "number",
-                                                "format": "float",
-                                                "example": 37.6
-                                            },
-                                            "ne_lat": {
-                                                "type": "number",
-                                                "format": "float",
-                                                "example": 55.8
-                                            },
-                                            "ne_lng": {
-                                                "type": "number",
-                                                "format": "float",
-                                                "example": 37.7
-                                            }
-                                        },
-                                        "type": "object"
-                                    }
-                                },
-                                "type": "object"
+                                "$ref": "#/components/schemas/GetOrganizationsByBoundsRequest"
                             }
                         }
                     }
@@ -420,6 +362,60 @@
     },
     "components": {
         "schemas": {
+            "GetOrganizationsByBoundsRequest": {
+                "title": "Get Organizations By Bounds Request",
+                "required": [
+                    "bounds"
+                ],
+                "properties": {
+                    "bounds": {
+                        "required": [
+                            "sw_lat",
+                            "sw_lng",
+                            "ne_lat",
+                            "ne_lng"
+                        ],
+                        "properties": {
+                            "sw_lat": {
+                                "description": "Southwest latitude",
+                                "type": "number",
+                                "format": "float",
+                                "maximum": 90,
+                                "minimum": -90
+                            },
+                            "sw_lng": {
+                                "description": "Southwest longitude",
+                                "type": "number",
+                                "format": "float",
+                                "maximum": 180,
+                                "minimum": -180
+                            },
+                            "ne_lat": {
+                                "description": "Northeast latitude",
+                                "type": "number",
+                                "format": "float",
+                                "maximum": 90,
+                                "minimum": -90
+                            },
+                            "ne_lng": {
+                                "description": "Northeast longitude",
+                                "type": "number",
+                                "format": "float",
+                                "maximum": 180,
+                                "minimum": -180
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "per_page": {
+                        "description": "Items per page",
+                        "type": "integer",
+                        "maximum": 100,
+                        "minimum": 1
+                    }
+                },
+                "type": "object"
+            },
             "GetOrganizationsByBuildingRequest": {
                 "title": "Get Organizations By Building Request",
                 "required": [
@@ -454,11 +450,12 @@
                 },
                 "type": "object"
             },
-            "GetOrganizationsByLocationRequest": {
-                "title": "Get Organizations By Location Request",
+            "GetOrganizationsByRadiusRequest": {
+                "title": "Get Organizations By Radius Request",
                 "required": [
                     "latitude",
-                    "longitude"
+                    "longitude",
+                    "radius"
                 ],
                 "properties": {
                     "latitude": {
@@ -478,37 +475,8 @@
                     "radius": {
                         "description": "Search radius in meters",
                         "type": "number",
-                        "format": "float"
-                    },
-                    "bounds": {
-                        "description": "Rectangular bounds for search",
-                        "properties": {
-                            "sw_lat": {
-                                "type": "number",
-                                "format": "float",
-                                "maximum": 90,
-                                "minimum": -90
-                            },
-                            "sw_lng": {
-                                "type": "number",
-                                "format": "float",
-                                "maximum": 180,
-                                "minimum": -180
-                            },
-                            "ne_lat": {
-                                "type": "number",
-                                "format": "float",
-                                "maximum": 90,
-                                "minimum": -90
-                            },
-                            "ne_lng": {
-                                "type": "number",
-                                "format": "float",
-                                "maximum": 180,
-                                "minimum": -180
-                            }
-                        },
-                        "type": "object"
+                        "format": "float",
+                        "minimum": 0
                     },
                     "per_page": {
                         "description": "Items per page",
